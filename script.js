@@ -1,42 +1,32 @@
 async function uploadFile() {
-    const fileInput = document.getElementById("fileInput");
-    const status = document.getElementById("status");
-    const file = fileInput.files[0];
 
-    if (!file) {
-        status.innerText = "Please choose a JSON file first.";
-        return;
-    }
+    const file = document.getElementById("fileInput").files[0];
 
-    try {
-        status.innerText = "Requesting upload URL...";
+    const response = await fetch("YOUR_API/dev/upload-url");
+    const data = await response.json();
 
-        const response = await fetch("https://5usqujga7b.execute-api.eu-west-1.amazonaws.com/dev/upload-url");
+    const uploadURL = data.uploadURL;
 
-        if (!response.ok) {
-            throw new Error(`Failed to get upload URL: ${response.status}`);
-        }
+    await fetch(uploadURL, {
+        method: "PUT",
+        body: file
+    });
 
-        const data = await response.json();
-        const uploadURL = data.uploadURL;
+    document.getElementById("status").innerText = "Upload complete!";
+}
 
-        status.innerText = "Uploading file to S3...";
+async function loadStats() {
 
-        const uploadResponse = await fetch(uploadURL, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: file
-        });
+    const response = await fetch("YOUR_API/dev/stats");
 
-        if (!uploadResponse.ok) {
-            throw new Error(`S3 upload failed: ${uploadResponse.status}`);
-        }
+    const data = await response.json();
 
-        status.innerText = "Upload complete!";
-    } catch (error) {
-        console.error("Upload error:", error);
-        status.innerText = "Upload failed. Check browser console and AWS settings.";
-    }
+    const list = document.getElementById("statsList");
+    list.innerHTML = "";
+
+    data.forEach(item => {
+        const li = document.createElement("li");
+        li.innerText = item.programme + ": " + item.studentCount;
+        list.appendChild(li);
+    });
 }
