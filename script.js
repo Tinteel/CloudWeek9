@@ -17,7 +17,7 @@ async function uploadFile() {
 
 async function loadStats() {
 
-    const response = await fetch("1j815j8jpd.execute-api.eu-west-1.amazonaws.com/stats");
+    const response = await fetch("https://1j815j8jpd.execute-api.eu-west-1.amazonaws.com/stats");
 
     const data = await response.json();
 
